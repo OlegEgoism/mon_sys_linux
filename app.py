@@ -26,6 +26,7 @@ settings_label = "Настройки"
 exit_app = "Выход"
 apply_label = "Применить"
 cancel_label = "Отмена"
+download_log = "Скачать логи"
 time_update = 1
 
 LOG_FILE = os.path.join(os.path.expanduser("~"), "info_log.txt")
@@ -119,7 +120,7 @@ class SettingsDialog(Gtk.Dialog):
         self.uptime_check.set_active(self.visibility_settings['uptime'])
         box.add(self.uptime_check)
 
-        self.download_button = Gtk.Button(label="Скачать логи")
+        self.download_button = Gtk.Button(label=download_log)
         self.download_button.connect("clicked", self.download_log_file)
         box.add(self.download_button)
 
