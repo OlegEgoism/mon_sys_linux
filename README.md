@@ -16,17 +16,17 @@
 
 -  ЗАПУСК В РЕЖИМИ РАЗАРБОТКИ.
 
-📁 Установка apt для Debian/Ubuntu (основные библиотеки).
+💡 Установка apt для Debian/Ubuntu (основные библиотеки).
 ```bash
 sudo apt update
 sudo apt install python3-gi python3-gi-cairo gir1.2-gtk-3.0 gir1.2-appindicator3-0.1
 ```
-📁 Python-зависимости.
+💡 Python-зависимости.
 ```bash
 pip install -r requirements.txt
 ```
 
-📁 Дополнительно (для GNOME Shell).
+💡 Дополнительно (для GNOME Shell).
 ```bash
 sudo apt install gnome-shell-extension-appindicator
 ```
@@ -58,3 +58,5 @@ chmod +x build_deb.sh
 ```bash
 sudo dpkg -i deb_build/mon-sys.deb
 ```
+
+По вопросам писать на почту 📨: olegpustovalov220@gmail.com 
