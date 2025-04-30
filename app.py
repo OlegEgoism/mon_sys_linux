@@ -28,6 +28,8 @@ apply_label = "Применить"
 cancel_label = "Отмена"
 time_update = 1
 
+LOG_FILE = os.path.join(os.path.expanduser("~"), "info_log.txt")
+
 
 class SystemUsage:
     """Мониторинг ресурсов системы"""
@@ -80,8 +82,7 @@ class SettingsDialog(Gtk.Dialog):
     """Диалоговое окно настроек"""
 
     def __init__(self, parent, visibility_settings):
-        super().__init__(title="Настройки отображения", transient_for=parent, flags=0)
-        self.set_default_size(250, 300)
+        super().__init__(title="Настройки", transient_for=parent, flags=0)
         self.add_buttons(cancel_label, Gtk.ResponseType.CANCEL, apply_label, Gtk.ResponseType.OK)
         self.visibility_settings = visibility_settings
         box = self.get_content_area()
@@ -118,7 +119,30 @@ class SettingsDialog(Gtk.Dialog):
         self.uptime_check.set_active(self.visibility_settings['uptime'])
         box.add(self.uptime_check)
 
+        self.download_button = Gtk.Button(label="Скачать логи")
+        self.download_button.connect("clicked", self.download_log_file)
+        box.add(self.download_button)
+
         self.show_all()
+
+    def download_log_file(self, widget):
+        dialog = Gtk.FileChooserDialog(
+            title="Сохранить лог-файл",
+            parent=self,
+            action=Gtk.FileChooserAction.SAVE
+        )
+        dialog.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_SAVE, Gtk.ResponseType.OK)
+        dialog.set_current_name("info_log.txt")
+
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            dest_path = dialog.get_filename()
+            try:
+                with open(LOG_FILE, "r", encoding="utf-8") as src, open(dest_path, "w", encoding="utf-8") as dst:
+                    dst.write(src.read())
+            except Exception as e:
+                print("Ошибка при сохранении лога:", e)
+        dialog.destroy()
 
 
 class SystemTrayApp:
@@ -260,6 +284,20 @@ class SystemTrayApp:
 
         tray_text = "" + "  ".join(tray_parts)
         self.indicator.set_label(tray_text, "")
+        self.indicator.set_label(tray_text, "")
+
+        """Логирование"""
+        try:
+            with open(LOG_FILE, "a", encoding="utf-8") as f:
+                f.write(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] "
+                        f"CPU: {cpu_usage:.0f}% {cpu_temp}°C | "
+                        f"RAM: {ram_used:.1f}/{ram_total:.1f} GB | "
+                        f"SWAP: {swap_used:.1f}/{swap_total:.1f} GB | "
+                        f"Disk: {disk_used:.1f}/{disk_total:.1f} GB | "
+                        f"Net: ↓{net_recv_speed:.1f}/↑{net_sent_speed:.1f} MB/s | "
+                        f"Uptime: {uptime}\n")
+        except Exception as e:
+            print("Ошибка записи в лог:", e)
 
         return True
 
