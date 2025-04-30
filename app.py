@@ -3,6 +3,7 @@ import psutil
 import signal
 import time
 import os
+import json
 from datetime import timedelta
 
 gi.require_version('Gtk', '3.0')
@@ -129,16 +130,8 @@ class SystemTrayApp:
         self.indicator.set_icon_full(icon_path, "System Monitor")
         self.indicator.set_status(appindicator.IndicatorStatus.ACTIVE)
 
-        self.visibility_settings = {
-            'cpu': True,
-            'ram': True,
-            'swap': True,
-            'disk': True,
-            'net': True,
-            'uptime': True,
-            'tray_cpu': True,
-            'tray_ram': True
-        }
+        self.settings_file = os.path.join(os.path.expanduser("~"), ".system_tray_settings.json")
+        self.visibility_settings = self.load_settings()
 
         self.menu = Gtk.Menu()
 
@@ -164,6 +157,26 @@ class SystemTrayApp:
             'sent': psutil.net_io_counters().bytes_sent,
             'time': time.time()
         }
+
+    def load_settings(self):
+        default = {
+            'cpu': True, 'ram': True, 'swap': True, 'disk': True, 'net': True, 'uptime': True,
+            'tray_cpu': True, 'tray_ram': True
+        }
+        try:
+            with open(self.settings_file, "r", encoding="utf-8") as f:
+                saved = json.load(f)
+                default.update(saved)
+        except Exception:
+            pass
+        return default
+
+    def save_settings(self):
+        try:
+            with open(self.settings_file, "w", encoding="utf-8") as f:
+                json.dump(self.visibility_settings, f, indent=4)
+        except Exception as e:
+            print("Ошибка при сохранении настроек:", e)
 
     def update_menu_visibility(self):
         for item in self.menu.get_children():
@@ -208,6 +221,7 @@ class SystemTrayApp:
             self.visibility_settings['tray_ram'] = dialog.tray_ram_check.get_active()
 
             self.update_menu_visibility()
+            self.save_settings()
 
         dialog.destroy()
 
@@ -238,16 +252,17 @@ class SystemTrayApp:
         if self.visibility_settings['uptime']:
             self.uptime_item.set_label(f"{uptime_label}: {uptime}")
 
-        """Обновляем в трее (CPU и RAM)"""
-        tray_text = ""
-        if self.visibility_settings['cpu']:
-            tray_text += f"  {cpu_info}: {cpu_usage:.0f}%"
-        if self.visibility_settings['ram']:
-            tray_text += f"  {ram_loading}: {ram_used:.1f}GB"
+        tray_parts = []
+        if self.visibility_settings.get('tray_cpu', True):
+            tray_parts.append(f"{cpu_info}: {cpu_usage:.0f}%")
+        if self.visibility_settings.get('tray_ram', True):
+            tray_parts.append(f"{ram_loading}: {ram_used:.1f}GB")
 
+        tray_text = "  " + "  ".join(tray_parts)
         self.indicator.set_label(tray_text, "")
 
         return True
+
     def quit(self, *args):
         Gtk.main_quit()
 
