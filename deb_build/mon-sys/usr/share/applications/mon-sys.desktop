@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=System Monitor
+Exec=python3 /usr/local/bin/mon-sys/app.py
+Icon=/usr/local/bin/mon-sys/logo.png
+Type=Application
+Categories=Utility;
