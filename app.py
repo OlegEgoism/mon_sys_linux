@@ -254,11 +254,11 @@ class SystemTrayApp:
 
         tray_parts = []
         if self.visibility_settings.get('tray_cpu', True):
-            tray_parts.append(f"{cpu_info}: {cpu_usage:.0f}%")
+            tray_parts.append(f"  {cpu_info}: {cpu_usage:.0f}%")
         if self.visibility_settings.get('tray_ram', True):
             tray_parts.append(f"{ram_loading}: {ram_used:.1f}GB")
 
-        tray_text = "  " + "  ".join(tray_parts)
+        tray_text = "" + "  ".join(tray_parts)
         self.indicator.set_label(tray_text, "")
 
         return True
