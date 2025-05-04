@@ -10,8 +10,8 @@ gi.require_version('Gtk', '3.0')
 gi.require_version('GLib', '2.0')
 gi.require_version('AppIndicator3', '0.1')
 
-from gi.repository import Gtk, GLib
-from gi.repository import AppIndicator3 as appindicator
+from gi.repository import Gtk, GLib, AppIndicator3
+# from gi.repository import AppIndicator3 as appindicator
 
 """Элементы"""
 cpu_tray = "ЦПУ в трее"
@@ -150,10 +150,10 @@ class SystemTrayApp:
     """Приложение для системного трея"""
 
     def __init__(self):
-        self.indicator = appindicator.Indicator.new("mon_sys", "", appindicator.IndicatorCategory.SYSTEM_SERVICES)
+        self.indicator = AppIndicator3.Indicator.new("mon_sys", "", AppIndicator3.IndicatorCategory.SYSTEM_SERVICES)
         icon_path = os.path.join(os.path.dirname(__file__), "logo.png")
         self.indicator.set_icon_full(icon_path, "System Monitor")
-        self.indicator.set_status(appindicator.IndicatorStatus.ACTIVE)
+        self.indicator.set_status(AppIndicator3.IndicatorStatus.ACTIVE)
 
         self.settings_file = os.path.join(os.path.expanduser("~"), ".system_tray_settings.json")
         self.visibility_settings = self.load_settings()
