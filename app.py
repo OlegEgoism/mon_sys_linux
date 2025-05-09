@@ -234,8 +234,7 @@ class SystemTrayApp:
     def __init__(self):
         global current_lang
 
-        self.indicator = AppIndicator3.Indicator.new(
-            "mon_sys", "", AppIndicator3.IndicatorCategory.SYSTEM_SERVICES)
+        self.indicator = AppIndicator3.Indicator.new("mon_sys", "", AppIndicator3.IndicatorCategory.SYSTEM_SERVICES)
         icon_path = os.path.join(os.path.dirname(__file__), "logo.png")
         self.indicator.set_icon_full(icon_path, "System Monitor")
         self.indicator.set_status(AppIndicator3.IndicatorStatus.ACTIVE)
@@ -417,5 +416,3 @@ if __name__ == "__main__":
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     app = SystemTrayApp()
     app.run()
-
-
