@@ -11,8 +11,7 @@
 📝 Вся информация записывается в логи. Логи находятся в корне диска /home (Домашняя папка)
 
 🎥 Видео-демо
-Посмотрите, как OFF_RES работает на практике:
-[![OFF_RES Видео-демо](https://img.youtube.com/vi/AVzxt623t2A/0.jpg)](https://www.youtube.com/watch?v=lcWTL0O7paI)
+[![Watch the video](https://img.youtube.com/vi/lcWTL0O7paI/maxresdefault.jpg)](https://www.youtube.com/watch?v=lcWTL0O7paI)
 
 -  ЗАПУСК В РЕЖИМИ РАЗАРБОТКИ.
 
@@ -20,6 +19,8 @@
 ```bash
 sudo apt update
 sudo apt install python3-gi python3-gi-cairo gir1.2-gtk-3.0 gir1.2-appindicator3-0.1
+sudo apt install -y build-essential libgirepository1.0-dev gir1.2-glib-2.0 python3-gi python3-gi-cairo gobject-introspection
+
 ```
 Если буду проблемы добавить
 ```bash
