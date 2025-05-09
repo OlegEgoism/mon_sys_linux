@@ -28,7 +28,8 @@ LANGUAGES = {
         'cancel_label': "Отмена",
         'download_log': "Скачать логи",
         'language_label': "Язык интефейса",
-        'language_name': "Русский"
+        'language_name': "Русский",
+        'enable_logging': "Включить логирование"
     },
     'en': {
         'cpu_tray': "CPU in tray",
@@ -45,7 +46,8 @@ LANGUAGES = {
         'cancel_label': "Cancel",
         'download_log': "Download logs",
         'language_label': "Interface Language",
-        'language_name': "English"
+        'language_name': "English",
+        'enable_logging': "Enable logging"
     },
     'cn': {
         'cpu_tray': "CPU在托盘",
@@ -62,7 +64,8 @@ LANGUAGES = {
         'cancel_label': "取消",
         'download_log': "下载日志",
         'language_label': "界面语言",
-        'language_name': "中文"
+        'language_name': "中文",
+        'enable_logging': "启用日志记录"
     },
     'de': {
         'cpu_tray': "CPU im Tray",
@@ -79,7 +82,8 @@ LANGUAGES = {
         'cancel_label': "Abbrechen",
         'download_log': "Logs herunterladen",
         'language_label': "Schnittstellen Sprache",
-        'language_name': "Deutsch"
+        'language_name': "Deutsch",
+        'enable_logging': "Protokollierung aktivieren"
     }
 }
 
@@ -181,6 +185,10 @@ class SettingsDialog(Gtk.Dialog):
         self.uptime_check.set_active(self.visibility_settings['uptime'])
         box.add(self.uptime_check)
 
+        self.logging_check = Gtk.CheckButton(label=tr('enable_logging'))
+        self.logging_check.set_active(self.visibility_settings.get('logging_enabled', True))
+        box.add(self.logging_check)
+
         lang_box = Gtk.Box(spacing=6)
         lang_label = Gtk.Label(label=tr('language_label') + ":")
         lang_box.pack_start(lang_label, False, False, 0)
@@ -268,7 +276,7 @@ class SystemTrayApp:
     def load_settings(self):
         default = {
             'cpu': True, 'ram': True, 'swap': True, 'disk': True, 'net': True, 'uptime': True,
-            'tray_cpu': True, 'tray_ram': True, 'language': 'ru'
+            'tray_cpu': True, 'tray_ram': True, 'language': 'ru', 'logging_enabled': True
         }
         try:
             with open(self.settings_file, "r", encoding="utf-8") as f:
@@ -332,6 +340,7 @@ class SystemTrayApp:
             self.visibility_settings['tray_cpu'] = dialog.tray_cpu_check.get_active()
             self.visibility_settings['tray_ram'] = dialog.tray_ram_check.get_active()
             self.visibility_settings['language'] = new_lang
+            self.visibility_settings['logging_enabled'] = dialog.logging_check.get_active()
 
             current_lang = new_lang
 
@@ -382,18 +391,18 @@ class SystemTrayApp:
         self.indicator.set_label(tray_text, "")
 
         """Логирование"""
-        try:
-            with open(LOG_FILE, "a", encoding="utf-8") as f:
-                f.write(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] "
-                        f"CPU: {cpu_usage:.0f}% {cpu_temp}°C | "
-                        f"RAM: {ram_used:.1f}/{ram_total:.1f} GB | "
-                        f"SWAP: {swap_used:.1f}/{swap_total:.1f} GB | "
-                        f"Disk: {disk_used:.1f}/{disk_total:.1f} GB | "
-                        f"Net: ↓{net_recv_speed:.1f}/↑{net_sent_speed:.1f} MB/s | "
-                        f"Uptime: {uptime}\n")
-        except Exception as e:
-            print("Ошибка записи в лог:", e)
-
+        if self.visibility_settings.get('logging_enabled', True):
+            try:
+                with open(LOG_FILE, "a", encoding="utf-8") as f:
+                    f.write(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] "
+                            f"CPU: {cpu_usage:.0f}% {cpu_temp}°C | "
+                            f"RAM: {ram_used:.1f}/{ram_total:.1f} GB | "
+                            f"SWAP: {swap_used:.1f}/{swap_total:.1f} GB | "
+                            f"Disk: {disk_used:.1f}/{disk_total:.1f} GB | "
+                            f"Net: ↓{net_recv_speed:.1f}/↑{net_sent_speed:.1f} MB/s | "
+                            f"Uptime: {uptime}\n")
+            except Exception as e:
+                print("Ошибка записи в лог:", e)
         return True
 
     def quit(self, *args):
@@ -408,3 +417,5 @@ if __name__ == "__main__":
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     app = SystemTrayApp()
     app.run()
+
+
